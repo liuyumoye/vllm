@@ -1307,6 +1307,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
         num_scheduled_tokens_np: np.ndarray,
         finished_sending: Optional[set[str]],
         finished_recving: Optional[set[str]],
+        finish_loading_dict: Optional[dict[str,int]],
     ) -> ModelRunnerOutput:
         assert self.input_batch.num_reqs ==\
             len(self.input_batch.pooling_params), \
@@ -1343,6 +1344,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
             pooler_output=pooler_output,
             finished_sending=finished_sending,
             finished_recving=finished_recving,
+            finish_loading_dict=finish_loading_dict,
         )
 
     @torch.inference_mode()
@@ -1461,6 +1463,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
             self.maybe_wait_for_kv_save()
             finished_sending, finished_recving = (
                 self.get_finished_kv_transfers(scheduler_output))
+            finish_loading_dict = self.get_finish_loading(scheduler_output)
 
         if self.use_aux_hidden_state_outputs:
             hidden_states, aux_hidden_states = model_output
@@ -1478,9 +1481,10 @@ class GPUModelRunner(LoRAModelRunnerMixin):
         if not get_pp_group().is_last_rank:
             # For mid-pipeline stages, return the hidden states.
             if not broadcast_pp_output:
-                if finished_sending or finished_recving:
+                if finished_sending or finished_recving or finish_loading_dict:
                     hidden_states.finished_sending = finished_sending
                     hidden_states.finished_recving = finished_recving
+                    hidden_states.finish_loading_dict = finish_loading_dict
                 return hidden_states
             assert isinstance(hidden_states, IntermediateTensors)
             get_pp_group().send_tensor_dict(hidden_states.tensors,
@@ -1490,7 +1494,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
             if self.input_batch.pooling_params:
                 return self._pool(hidden_states, num_scheduled_tokens,
                                   num_scheduled_tokens_np, finished_sending,
-                                  finished_recving)
+                                  finished_recving, finish_loading_dict)
 
             sample_hidden_states = hidden_states[logits_indices]
             logits = self.model.compute_logits(sample_hidden_states, None)
@@ -1642,6 +1646,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
             pooler_output=[],
             finished_sending=finished_sending,
             finished_recving=finished_recving,
+            finish_loading_dict=finish_loading_dict,
             num_nans_in_logits=num_nans_in_logits,
         )
 
@@ -1765,7 +1770,16 @@ class GPUModelRunner(LoRAModelRunnerMixin):
     def maybe_wait_for_kv_save() -> None:
         if has_kv_transfer_group():
             get_kv_transfer_group().wait_for_save()
-
+            
+    @staticmethod
+    def get_finish_loading(
+        scheduler_output: "SchedulerOutput",
+    ) -> dict[str, int]:
+        if has_kv_transfer_group():
+            if hasattr(get_kv_transfer_group(), 'get_finish_loading'):
+                return get_kv_transfer_group().get_finish_loading()
+        return {}
+    
     @staticmethod
     def get_finished_kv_transfers(
         scheduler_output: "SchedulerOutput",
@@ -1782,13 +1796,15 @@ class GPUModelRunner(LoRAModelRunnerMixin):
             self.maybe_setup_kv_connector(scheduler_output)
             finished_sending, finished_recving = (
                 self.get_finished_kv_transfers(scheduler_output))
+            finish_loading_dict = self.get_finish_loading(scheduler_output)
 
-        if not finished_sending and not finished_recving:
+        if not finished_sending and not finished_recving and not finish_loading_dict:
             return EMPTY_MODEL_RUNNER_OUTPUT
 
         output = copy.copy(EMPTY_MODEL_RUNNER_OUTPUT)
         output.finished_sending = finished_sending
         output.finished_recving = finished_recving
+        output.finish_loading_dict = finish_loading_dict
         return output
 
     def propose_ngram_draft_token_ids(

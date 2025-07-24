@@ -1167,7 +1167,8 @@ class IntermediateTensors:
     # [req_ids]
     finished_sending: Optional[set[str]] = None
     finished_recving: Optional[set[str]] = None
-
+    #req_id -> num_actual_load_tokens
+    finish_loading_dict: Optional[dict[str, int]] = None
     def __init__(self, tensors):
         # manually define this function, so that
         # Dynamo knows `IntermediateTensors()` comes from this file.
