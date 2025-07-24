@@ -1,7 +1,4 @@
----
-title: AutoAWQ
----
-[](){ #auto-awq }
+# AutoAWQ
 
 To create a new 4-bit quantized model, you can leverage [AutoAWQ](https://github.com/casper-hansen/AutoAWQ).
 Quantization reduces the model's precision from BF16/FP16 to INT4 which effectively reduces the total model memory footprint.
@@ -9,13 +6,13 @@ The main benefits are lower latency and memory usage.
 
 You can quantize your own models by installing AutoAWQ or picking one of the [6500+ models on Huggingface](https://huggingface.co/models?search=awq).
 
-```console
+```bash
 pip install autoawq
 ```
 
 After installing AutoAWQ, you are ready to quantize a model. Please refer to the [AutoAWQ documentation](https://casper-hansen.github.io/AutoAWQ/examples/#basic-quantization) for further details. Here is an example of how to quantize `mistralai/Mistral-7B-Instruct-v0.2`:
 
-??? Code
+??? code
 
     ```python
     from awq import AutoAWQForCausalLM
@@ -43,7 +40,7 @@ After installing AutoAWQ, you are ready to quantize a model. Please refer to the
 
 To run an AWQ model with vLLM, you can use [TheBloke/Llama-2-7b-Chat-AWQ](https://huggingface.co/TheBloke/Llama-2-7b-Chat-AWQ) with the following command:
 
-```console
+```bash
 python examples/offline_inference/llm_engine_example.py \
     --model TheBloke/Llama-2-7b-Chat-AWQ \
     --quantization awq
@@ -51,7 +48,7 @@ python examples/offline_inference/llm_engine_example.py \
 
 AWQ models are also supported directly through the LLM entrypoint:
 
-??? Code
+??? code
 
     ```python
     from vllm import LLM, SamplingParams

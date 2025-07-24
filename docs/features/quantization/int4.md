@@ -1,7 +1,4 @@
----
-title: INT4 W4A16
----
-[](){ #int4 }
+# INT4 W4A16
 
 vLLM supports quantizing weights to INT4 for memory savings and inference acceleration. This quantization method is particularly useful for reducing model size and maintaining low latency in workloads with low queries per second (QPS).
 
@@ -14,13 +11,13 @@ Please visit the HF collection of [quantized INT4 checkpoints of popular LLMs re
 
 To use INT4 quantization with vLLM, you'll need to install the [llm-compressor](https://github.com/vllm-project/llm-compressor/) library:
 
-```console
+```bash
 pip install llmcompressor
 ```
 
 Additionally, install `vllm` and `lm-evaluation-harness` for evaluation:
 
-```console
+```bash
 pip install vllm lm-eval==0.4.4
 ```
 
@@ -53,7 +50,7 @@ When quantizing weights to INT4, you need sample data to estimate the weight upd
 It's best to use calibration data that closely matches your deployment data.
 For a general-purpose instruction-tuned model, you can use a dataset like `ultrachat`:
 
-??? Code
+??? code
 
     ```python
     from datasets import load_dataset
@@ -78,7 +75,7 @@ For a general-purpose instruction-tuned model, you can use a dataset like `ultra
 
 Now, apply the quantization algorithms:
 
-??? Code
+??? code
 
     ```python
     from llmcompressor.transformers import oneshot
@@ -111,13 +108,14 @@ After quantization, you can load and run the model in vLLM:
 
 ```python
 from vllm import LLM
-model = LLM("./Meta-Llama-3-8B-Instruct-W4A16-G128")
+
+llm = LLM("./Meta-Llama-3-8B-Instruct-W4A16-G128")
 ```
 
 To evaluate accuracy, you can use `lm_eval`:
 
-```console
-$ lm_eval --model vllm \
+```bash
+lm_eval --model vllm \
   --model_args pretrained="./Meta-Llama-3-8B-Instruct-W4A16-G128",add_bos_token=true \
   --tasks gsm8k \
   --num_fewshot 5 \
@@ -141,7 +139,7 @@ $ lm_eval --model vllm \
 
 The following is an example of an expanded quantization recipe you can tune to your own use case:
 
-??? Code
+??? code
 
     ```python
     from compressed_tensors.quantization import (

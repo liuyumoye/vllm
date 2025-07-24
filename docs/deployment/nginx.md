@@ -1,7 +1,4 @@
----
-title: Using Nginx
----
-[](){ #nginxloadbalancer }
+# Using Nginx
 
 This document shows how to launch multiple vLLM serving containers and use Nginx to act as a load balancer between the servers.
 
@@ -11,13 +8,13 @@ This document shows how to launch multiple vLLM serving containers and use Nginx
 
 This guide assumes that you have just cloned the vLLM project and you're currently in the vllm root directory.
 
-```console
+```bash
 export vllm_root=`pwd`
 ```
 
 Create a file named `Dockerfile.nginx`:
 
-```console
+```dockerfile
 FROM nginx:latest
 RUN rm /etc/nginx/conf.d/default.conf
 EXPOSE 80
@@ -26,7 +23,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 Build the container:
 
-```console
+```bash
 docker build . -f Dockerfile.nginx --tag nginx-lb
 ```
 
@@ -36,7 +33,7 @@ docker build . -f Dockerfile.nginx --tag nginx-lb
 
 Create a file named `nginx_conf/nginx.conf`. Note that you can add as many servers as you'd like. In the below example we'll start with two. To add more, add another `server vllmN:8000 max_fails=3 fail_timeout=10000s;` entry to `upstream backend`.
 
-??? Config
+??? console "Config"
 
     ```console
     upstream backend {
@@ -60,14 +57,14 @@ Create a file named `nginx_conf/nginx.conf`. Note that you can add as many serve
 
 ## Build vLLM Container
 
-```console
+```bash
 cd $vllm_root
 docker build -f docker/Dockerfile . --tag vllm
 ```
 
 If you are behind proxy, you can pass the proxy settings to the docker build command as shown below:
 
-```console
+```bash
 cd $vllm_root
 docker build \
     -f docker/Dockerfile . \
@@ -80,7 +77,7 @@ docker build \
 
 ## Create Docker Network
 
-```console
+```bash
 docker network create vllm_nginx
 ```
 
@@ -95,7 +92,7 @@ Notes:
 - The below example assumes GPU backend used. If you are using CPU backend, remove `--gpus device=ID`, add `VLLM_CPU_KVCACHE_SPACE` and `VLLM_CPU_OMP_THREADS_BIND` environment variables to the docker run command.
 - Adjust the model name that you want to use in your vLLM servers if you don't want to use `Llama-2-7b-chat-hf`.
 
-??? Commands
+??? console "Commands"
 
     ```console
     mkdir -p ~/.cache/huggingface/hub/
@@ -129,7 +126,7 @@ Notes:
 
 ## Launch Nginx
 
-```console
+```bash
 docker run \
     -itd \
     -p 8000:80 \
@@ -142,7 +139,7 @@ docker run \
 
 ## Verify That vLLM Servers Are Ready
 
-```console
+```bash
 docker logs vllm0 | grep Uvicorn
 docker logs vllm1 | grep Uvicorn
 ```

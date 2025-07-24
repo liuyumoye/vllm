@@ -1,7 +1,4 @@
----
-title: GPTQModel
----
-[](){ #gptqmodel }
+# GPTQModel
 
 To create a new 4-bit or 8-bit GPTQ quantized model, you can leverage [GPTQModel](https://github.com/ModelCloud/GPTQModel) from ModelCloud.AI.
 
@@ -21,7 +18,7 @@ for more details on this and other advanced features.
 
 You can quantize your own models by installing [GPTQModel](https://github.com/ModelCloud/GPTQModel) or picking one of the [5000+ models on Huggingface](https://huggingface.co/models?search=gptq).
 
-```console
+```bash
 pip install -U gptqmodel --no-build-isolation -v
 ```
 
@@ -31,7 +28,7 @@ After installing GPTQModel, you are ready to quantize a model. Please refer to t
 
 Here is an example of how to quantize `meta-llama/Llama-3.2-1B-Instruct`:
 
-??? Code
+??? code
 
     ```python
     from datasets import load_dataset
@@ -60,7 +57,7 @@ Here is an example of how to quantize `meta-llama/Llama-3.2-1B-Instruct`:
 
 To run an GPTQModel quantized model with vLLM, you can use [DeepSeek-R1-Distill-Qwen-7B-gptqmodel-4bit-vortex-v2](https://huggingface.co/ModelCloud/DeepSeek-R1-Distill-Qwen-7B-gptqmodel-4bit-vortex-v2) with the following command:
 
-```console
+```bash
 python examples/offline_inference/llm_engine_example.py \
     --model ModelCloud/DeepSeek-R1-Distill-Qwen-7B-gptqmodel-4bit-vortex-v2
 ```
@@ -69,7 +66,7 @@ python examples/offline_inference/llm_engine_example.py \
 
 GPTQModel quantized models are also supported directly through the LLM entrypoint:
 
-??? Code
+??? code
 
     ```python
     from vllm import LLM, SamplingParams

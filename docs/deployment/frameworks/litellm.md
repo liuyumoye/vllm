@@ -1,7 +1,4 @@
----
-title: LiteLLM
----
-[](){ #deployment-litellm }
+# LiteLLM
 
 [LiteLLM](https://github.com/BerriAI/litellm) call all LLM APIs using the OpenAI format [Bedrock, Huggingface, VertexAI, TogetherAI, Azure, OpenAI, Groq etc.]
 
@@ -18,7 +15,7 @@ And LiteLLM supports all models on VLLM.
 
 - Setup vLLM and litellm environment
 
-```console
+```bash
 pip install vllm litellm
 ```
 
@@ -28,13 +25,13 @@ pip install vllm litellm
 
 - Start the vLLM server with the supported chat completion model, e.g.
 
-```console
+```bash
 vllm serve qwen/Qwen1.5-0.5B-Chat
 ```
 
 - Call it with litellm:
 
-??? Code
+??? code
 
     ```python
     import litellm 
@@ -56,7 +53,7 @@ vllm serve qwen/Qwen1.5-0.5B-Chat
 
 - Start the vLLM server with the supported embedding model, e.g.
 
-```console
+```bash
 vllm serve BAAI/bge-base-en-v1.5
 ```
 

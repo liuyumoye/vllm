@@ -1,7 +1,4 @@
----
-title: Using Kubernetes
----
-[](){ #deployment-k8s }
+# Using Kubernetes
 
 Deploying vLLM on Kubernetes is a scalable and efficient way to serve machine learning models. This guide walks you through deploying vLLM using native Kubernetes.
 
@@ -16,6 +13,7 @@ Alternatively, you can deploy vLLM to Kubernetes using any of the following:
 - [Helm](frameworks/helm.md)
 - [InftyAI/llmaz](integrations/llmaz.md)
 - [KServe](integrations/kserve.md)
+- [KubeRay](integrations/kuberay.md)
 - [kubernetes-sigs/lws](frameworks/lws.md)
 - [meta-llama/llama-stack](integrations/llamastack.md)
 - [substratusai/kubeai](integrations/kubeai.md)
@@ -29,7 +27,7 @@ Alternatively, you can deploy vLLM to Kubernetes using any of the following:
 
 First, create a Kubernetes PVC and Secret for downloading and storing Hugging Face model:
 
-??? Config
+??? console "Config"
 
     ```bash
     cat <<EOF |kubectl apply -f -
@@ -57,7 +55,7 @@ First, create a Kubernetes PVC and Secret for downloading and storing Hugging Fa
 
 Next, start the vLLM server as a Kubernetes Deployment and Service:
 
-??? Config
+??? console "Config"
 
     ```bash
     cat <<EOF |kubectl apply -f -
@@ -115,7 +113,7 @@ Next, start the vLLM server as a Kubernetes Deployment and Service:
 
 We can verify that the vLLM server has started successfully via the logs (this might take a couple of minutes to download the model):
 
-```console
+```bash
 kubectl logs -l app.kubernetes.io/name=vllm
 ...
 INFO:     Started server process [1]
@@ -358,14 +356,14 @@ INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 
       Apply the deployment and service configurations using `kubectl apply -f <filename>`:
 
-      ```console
+      ```bash
       kubectl apply -f deployment.yaml
       kubectl apply -f service.yaml
       ```
 
       To test the deployment, run the following `curl` command:
 
-      ```console
+      ```bash
       curl http://mistral-7b.default.svc.cluster.local/v1/completions \
         -H "Content-Type: application/json" \
         -d '{

@@ -1,7 +1,4 @@
----
-title: INT8 W8A8
----
-[](){ #int8 }
+# INT8 W8A8
 
 vLLM supports quantizing weights and activations to INT8 for memory savings and inference acceleration.
 This quantization method is particularly useful for reducing model size while maintaining good performance.
@@ -15,13 +12,13 @@ Please visit the HF collection of [quantized INT8 checkpoints of popular LLMs re
 
 To use INT8 quantization with vLLM, you'll need to install the [llm-compressor](https://github.com/vllm-project/llm-compressor/) library:
 
-```console
+```bash
 pip install llmcompressor
 ```
 
 Additionally, install `vllm` and `lm-evaluation-harness` for evaluation:
 
-```console
+```bash
 pip install vllm lm-eval==0.4.4
 ```
 
@@ -54,7 +51,7 @@ When quantizing activations to INT8, you need sample data to estimate the activa
 It's best to use calibration data that closely matches your deployment data.
 For a general-purpose instruction-tuned model, you can use a dataset like `ultrachat`:
 
-??? Code
+??? code
 
     ```python
     from datasets import load_dataset
@@ -81,7 +78,7 @@ For a general-purpose instruction-tuned model, you can use a dataset like `ultra
 
 Now, apply the quantization algorithms:
 
-??? Code
+??? code
 
     ```python
     from llmcompressor.transformers import oneshot
@@ -117,13 +114,14 @@ After quantization, you can load and run the model in vLLM:
 
 ```python
 from vllm import LLM
-model = LLM("./Meta-Llama-3-8B-Instruct-W8A8-Dynamic-Per-Token")
+
+llm = LLM("./Meta-Llama-3-8B-Instruct-W8A8-Dynamic-Per-Token")
 ```
 
 To evaluate accuracy, you can use `lm_eval`:
 
-```console
-$ lm_eval --model vllm \
+```bash
+lm_eval --model vllm \
   --model_args pretrained="./Meta-Llama-3-8B-Instruct-W8A8-Dynamic-Per-Token",add_bos_token=true \
   --tasks gsm8k \
   --num_fewshot 5 \
